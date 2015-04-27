@@ -4,6 +4,10 @@
 
 #include "GameManager.h"
 
+
+
+static Tileset *lasttileset;
+
 /**
  * Fonction d'initialisation de la SDL_image
  * @return Status du chargement
@@ -91,7 +95,25 @@ void GRAPHIC_ApplyTexture(Texture* texture, int posX, int posY, int w, int h)
 
 }
 
-void GRAPHIC_PoliceLoad(char* filename, Police *police, int size)
+void GRAPHIC_ApplyTextureAlpha(Texture* texture, int posX, int posY, int w, int h, int alpha)
+{
+	SDL_Rect tmp;
+	tmp.x = posX;
+	tmp.y = posY;
+	tmp.w = w;
+	tmp.h = h;
+
+	SDL_SetTextureAlphaMod(texture->texture, alpha);
+	SDL_RenderCopy(Game_GetVariables()->renderer, texture->texture, NULL, &tmp);
+
+}
+
+
+
+
+
+
+void GRAPHIC_LoadPolice(char* filename, Police *police, int size)
 {
 	police->font = TTF_OpenFont(filename, size);
 	if(police->font == NULL)
@@ -100,6 +122,11 @@ void GRAPHIC_PoliceLoad(char* filename, Police *police, int size)
 		return;
 	}
 	printf("[INFO]\tFont \"%s\" Loaded size : %d\n", filename, size);
+}
+
+void GRAPHIC_FreePolice(Police *police)
+{
+	TTF_CloseFont(police->font);
 }
 
 void GRAPHIC_Text(Police *police, int posX, int posY, char* text)
@@ -119,8 +146,7 @@ void GRAPHIC_Text(Police *police, int posX, int posY, char* text)
 
 	SDL_Texture *_texture = SDL_CreateTextureFromSurface(Game_GetVariables()->renderer, _surface);
 	SDL_QueryTexture(_texture, NULL, NULL, &_pos.w, &_pos.h);
-	_pos.x -= _pos.w/2;
-	_pos.y -= _pos.h/2;
+
 
 	if(SDL_RenderCopy(Game_GetVariables()->renderer, _texture, NULL, &_pos) == -1)
 	{
@@ -152,7 +178,70 @@ void GRAPHIC_TextAlpha(Police *police, int posX, int posY, int alpha, char* text
 
 	SDL_Texture *_texture = SDL_CreateTextureFromSurface(Game_GetVariables()->renderer, _surface);
 	SDL_SetTextureAlphaMod(_texture, alpha);
+		SDL_QueryTexture(_texture, NULL, NULL, &_pos.w, &_pos.h);
+
+	if(SDL_RenderCopy(Game_GetVariables()->renderer, _texture, NULL, &_pos) == -1)
+	{
+		printf("[ERROR]\tError while writing : %s\n", text);
+		return;
+	}
+
+	SDL_FreeSurface(_surface);
+	SDL_DestroyTexture(_texture);
+}
+
+
+void GRAPHIC_TextCentered(Police *police, int posX, int posY, char* text)
+{
+	SDL_Rect _pos;
+	_pos.x = posX;
+	_pos.y = posY;
+
+	SDL_Color _white = {255, 255, 255};
+	SDL_Surface *_surface = TTF_RenderUTF8_Solid(police->font, text, _white);
+
+	if(_surface == NULL)
+	{
+		printf("[ERROR]\tError while creating font: %s\n", TTF_GetError());
+		return;
+	}
+
+	SDL_Texture *_texture = SDL_CreateTextureFromSurface(Game_GetVariables()->renderer, _surface);
 	SDL_QueryTexture(_texture, NULL, NULL, &_pos.w, &_pos.h);
+	_pos.x -= _pos.w/2;
+	_pos.y -= _pos.h/2;
+
+	if(SDL_RenderCopy(Game_GetVariables()->renderer, _texture, NULL, &_pos) == -1)
+	{
+		printf("[ERROR]\tError while writing : %s\n", text);
+		return;
+	}
+
+	SDL_FreeSurface(_surface);
+	SDL_DestroyTexture(_texture);
+
+}
+
+void GRAPHIC_TextCenteredAlpha(Police *police, int posX, int posY, int alpha, char* text)
+{
+	SDL_Rect _pos;
+	_pos.x = posX;
+	_pos.y = posY;
+
+	SDL_Color _white = {255, 255, 255};
+	SDL_Surface *_surface = TTF_RenderUTF8_Solid(police->font, text, _white);
+
+	if(_surface == NULL)
+	{
+		printf("[ERROR]\tError while creating font: %s\n", TTF_GetError());
+		return;
+	}
+
+
+
+	SDL_Texture *_texture = SDL_CreateTextureFromSurface(Game_GetVariables()->renderer, _surface);
+	SDL_SetTextureAlphaMod(_texture, alpha);
+		SDL_QueryTexture(_texture, NULL, NULL, &_pos.w, &_pos.h);
 	_pos.x -= _pos.w/2;
 	_pos.y -= _pos.h/2;
 
@@ -186,6 +275,8 @@ void GRAPHIC_LoadTile(char* filename, Tileset *tileset, int tilesize)
 		}
 	}
 
+	lasttileset = tileset;
+
 	printf("[INFO]\tTilesets %s: Loaded %ix%i\n", filename, tilesize, tilesize);
 }
 
@@ -197,17 +288,33 @@ void GRAPHIC_FreeTile(Tileset *tileset)
 
 void GRAPHIC_ApplyTile(Tileset *tileset, int posX, int posY, int id)
 {
-	SDL_Rect _dst;
-	_dst.x = posX * tileset->tilesize;
-	_dst.y = posY * tileset->tilesize;
-	_dst.h = tileset->tilesize;
-	_dst.w = tileset->tilesize;
+	if(tileset == NULL)
+	{
+		SDL_Rect _dst;
+		_dst.x = posX * lasttileset->tilesize;
+		_dst.y = posY * lasttileset->tilesize;
+		_dst.h = lasttileset->tilesize;
+		_dst.w = lasttileset->tilesize;
 
-	SDL_RenderCopy(
-			Game_GetVariables()->renderer,
-			tileset->palette.texture,
-			&tileset->clip.array[id],
-			&_dst);
+		SDL_RenderCopy(
+				Game_GetVariables()->renderer,
+				lasttileset->palette.texture,
+				&lasttileset->clip.array[id],
+				&_dst);
+	}
+	else
+	{
+		SDL_Rect _dst;
+		_dst.x = posX * tileset->tilesize;
+		_dst.y = posY * tileset->tilesize;
+		_dst.h = tileset->tilesize;
+		_dst.w = tileset->tilesize;
 
+		SDL_RenderCopy(
+				Game_GetVariables()->renderer,
+				tileset->palette.texture,
+				&tileset->clip.array[id],
+				&_dst);
 
+	}
 }

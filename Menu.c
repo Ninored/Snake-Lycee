@@ -51,7 +51,7 @@ static Texture background;
 void Init()
 {
 	SDL_RenderClear(Game_GetVariables()->renderer);
-	GRAPHIC_PoliceLoad("./Assets/Menu/font.ttf", &font, 22);
+	GRAPHIC_LoadPolice("./Assets/Menu/font.ttf", &font, 22);
 	GRAPHIC_LoadTexture("./Assets/Menu/Menu_Background_Button.jpg",&background);
 
 	// push state splash screen
@@ -61,6 +61,7 @@ void Init()
 void CleanUp()
 {
 	GRAPHIC_FreeTexture(&background);
+	GRAPHIC_FreePolice(&font);
 }
 
 void Pause()
@@ -122,22 +123,22 @@ void Update()
 	{
 		alpha -= 5;
 		if(alpha < -255) alpha = 255;
-		GRAPHIC_TextAlpha(&font, 640, 388, abs(alpha),"PLAY");
+		GRAPHIC_TextCenteredAlpha(&font, 640, 388, abs(alpha),"PLAY");
 	}
 	else
 	{
-		GRAPHIC_Text(&font, 640, 388, "PLAY");
+		GRAPHIC_TextCentered(&font, 640, 388, "PLAY");
 	}
 
 	if(selector == 1)
 	{
 		alpha -= 5;
 		if(alpha < -255) alpha = 255;
-		GRAPHIC_TextAlpha(&font, 640, 544, abs(alpha),"EXIT");
+		GRAPHIC_TextCenteredAlpha(&font, 640, 544, abs(alpha),"EXIT");
 	}
 	else
 	{
-		GRAPHIC_Text(&font, 640, 544,"EXIT");
+		GRAPHIC_TextCentered(&font, 640, 544,"EXIT");
 	}
 
 

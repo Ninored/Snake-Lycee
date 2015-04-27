@@ -39,8 +39,8 @@ void Game_Init()
 		exit(-1);
 
 	//Creation de la fenetre
-	gameVariables.Window_H = 720;
-	gameVariables.Window_W = 1280;
+	gameVariables.Window_H = 16 * MAP_H;  //720
+	gameVariables.Window_W = 16 * MAP_W;  //1280
 	gameVariables.window =
 			SDL_CreateWindow(
 					"Prototype State Manager",
@@ -75,6 +75,7 @@ void Game_CleanUp()
 	for(i = 1; i < stateVec.used; i++)
 	{
 		stateVec.vector[i]->CleanUp();
+		SV_PopState(&stateVec);
 	}
 
 	SV_Destroy(&stateVec);

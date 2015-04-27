@@ -1,16 +1,12 @@
-/*
- * GameManager.h
- *
- *  Created on: 21 avr. 2015
- *      Author: Ulysse
- */
-
 #ifndef GAMEMANAGER_H_
 #define GAMEMANAGER_H_
 
 #include "GamePattern.h"
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+
+#define MAP_W 80	// taille en tile
+#define MAP_H 45 // taille en tile
 
 
 typedef struct {

@@ -1,8 +1,11 @@
 #ifndef MAP_H_
 #define MAP_H_
 
-void MAP_Init(void);
+enum ITEM { VIDE, MURE, POMME};
 
+
+void MAP_Init(void);
+enum ITEM MAP_GetColision(int posX, int posY);
 void MAP_GenerateRandomeItem(void);
 void MAP_Draw(void);
 

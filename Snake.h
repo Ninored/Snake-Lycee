@@ -11,7 +11,6 @@ typedef struct
 } Position;
 
 enum Direction {NORD, SUD, EST, OEST};
-enum ITEM { MURE, POMME};
 
 typedef struct
 {
@@ -22,11 +21,11 @@ typedef struct
 }Serpent;
 
 void SERPENT_Init(Serpent *serpent);
-void SERPENT_Free(Serpent *serpent);
 
 void SERPENT_ChangeDirection(Serpent *serpent, enum Direction direction);
 void SERPENT_Avancer(Serpent *serpent);
 void SERPENT_GetColision(Serpent *serpent);
+void SERPENT_Grow(Serpent *serpent);
 void SERPENT_Draw(Serpent *serpent, Tileset *tileset);
 
 #endif /* SNAKE_H_ */

@@ -1,5 +1,8 @@
 #include "Snake.h"
 #include "TilesID.h"
+#include "Map.h"
+#include "GameManager.h"
+#include "SplashScreenGameOver.h"
 
 void SERPENT_Init(Serpent *serpent)
 {
@@ -16,15 +19,29 @@ void SERPENT_Init(Serpent *serpent)
 	serpent->corp[1].y = 22;
 
 }
-void SERPENT_Free(Serpent *serpent)
-{
-
-}
 
 
 void SERPENT_ChangeDirection(Serpent *serpent, enum Direction direction)
 {
-	serpent->direction = direction;
+	// Evite de passer sur lui meme
+	switch(direction)
+	{
+	case NORD:
+		if(serpent->direction != SUD) serpent->direction = direction;
+		break;
+
+	case SUD:
+		if(serpent->direction != NORD) serpent->direction = direction;
+		break;
+
+	case EST:
+		if(serpent->direction != OEST) serpent->direction = direction;
+		break;
+
+	case OEST:
+		if(serpent->direction != EST) serpent->direction = direction;
+		break;
+	}
 }
 void SERPENT_Avancer(Serpent *serpent)
 {
@@ -52,22 +69,51 @@ void SERPENT_Avancer(Serpent *serpent)
 	case OEST:
 		serpent->Tete.x--;
 		break;
+	default:
+		Game_Quit();
+		break;
 	}
 }
 void SERPENT_GetColision(Serpent *serpent)
 {
 	// Colision avec lui meme
-/*	unsigned int i= 0;
+	unsigned int i= 0;
 	for(i = 0; i < serpent->longueur; i++)
 	{
 		if(
 				serpent->Tete.x == serpent->corp[i].x &&
 				serpent->Tete.y == serpent->corp[i].y
 				)
+			Game_Quit();
 
 	}
-	*/
+
+	// Colision avec item et décors
+	switch(MAP_GetColision(serpent->Tete.x, serpent->Tete.y))
+	{
+	case POMME:
+		SERPENT_Grow(serpent);
+		// Score
+		break;
+	case MURE:
+
+		Game_PushState(SplashGameOver_Instance());
+		// Score Instance push
+		break;
+	default:
+		break;
+	}
 }
+
+void SERPENT_Grow(Serpent *serpent)
+{
+	// Augmenter la longueur du serpent
+	if(serpent->longueur < 100)
+	{
+		serpent->longueur++;
+	}
+}
+
 void SERPENT_Draw(Serpent *serpent, Tileset *tileset)
 {
 	unsigned int i = 0;
