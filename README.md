@@ -9,7 +9,7 @@ Pour compiler ce projet vous aurez besoins des librairies
   
 Pour compiler ce projet ajoutez les flags
   - mingw32   (windows uniquement)
-  - SDL2_main (windows uniquement)
+  - SDL2main (windows uniquement)
   - SDL2
   - SDL2_image
   - SDL2_ttf
