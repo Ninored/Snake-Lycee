@@ -7,6 +7,7 @@
 #include "Map.h"
 #include "SplashScreenPlay.h"
 
+
 static void Init();
 static void CleanUp();
 static void Pause();
@@ -34,6 +35,7 @@ Instance* Play_Instance(void)
 // Variables Propre au fichier
 static SDL_Event event;
 static Texture background;
+static Police font;
 static Tileset tileset;
 static Serpent serpent;
 static int clk = 0;  // variable temps ecoulé entre chaque images
@@ -44,6 +46,7 @@ void Init()
 	SDL_RenderClear(Game_GetVariables()->renderer);
 	GRAPHIC_LoadTile("./Assets/Play/tileset.png",&tileset, 16);
 	GRAPHIC_LoadTexture("./Assets/Play/Play_Background.jpg", &background);
+	GRAPHIC_LoadPolice("./Assets/Play/font.ttf", &font, 16);
 	SERPENT_Init(&serpent);
 	MAP_Init();
 
@@ -55,6 +58,7 @@ void CleanUp()
 {
 	GRAPHIC_FreeTile(&tileset);
 	GRAPHIC_FreeTexture(&background);
+	GRAPHIC_FreePolice(&font);
 }
 
 void Pause()
@@ -136,10 +140,11 @@ void Draw()
 	SDL_RenderClear(Game_GetVariables()->renderer);
 
 	GRAPHIC_ApplyTexture(&background, 0, 0, Game_GetVariables()->Window_W, Game_GetVariables()->Window_H);
+
 	MAP_Draw();
 
 	SERPENT_Draw(&serpent, &tileset);
 
 	SDL_RenderPresent(Game_GetVariables()->renderer);
-//	SDL_UpdateWindowSurface(Game_GetVariables()->window);
+	SDL_UpdateWindowSurface(Game_GetVariables()->window);
 }

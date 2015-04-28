@@ -36,13 +36,11 @@ void SV_PushState(StateVector *sv, Instance *instance)
 }
 void SV_PopState(StateVector *sv)
 {
-
-	//realloc(sv->vector, (sv->size - 1) * sizeof(Instance*));
 	Instance **tmp  = (Instance**)malloc((sv->size - 1) * sizeof(Instance*));
 
 
 	unsigned int i = 0;
-	for(i = 0; i < sv->used; i++ )
+	for(i = 0; i < sv->used - 1; i++ )
 	{
 		tmp[i] = sv->vector[i];
 	}

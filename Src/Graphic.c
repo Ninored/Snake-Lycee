@@ -118,7 +118,7 @@ void GRAPHIC_LoadPolice(char* filename, Police *police, int size)
 	police->font = TTF_OpenFont(filename, size);
 	if(police->font == NULL)
 	{
-		printf("[ERROR]\t|Error while charging font \"%s\":\n\\t|-> %s\n", filename, TTF_GetError());
+		printf("[ERROR]\t|Error while charging font \"%s\":\n\t|-> %s\n", filename, TTF_GetError());
 		return;
 	}
 	printf("[INFO]\tFont \"%s\" Loaded size : %d\n", filename, size);

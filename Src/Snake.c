@@ -4,6 +4,7 @@
 #include "GameManager.h"
 #include "SplashScreenGameOver.h"
 
+
 void SERPENT_Init(Serpent *serpent)
 {
 	serpent->Tete.x = 40;
@@ -93,12 +94,9 @@ void SERPENT_GetColision(Serpent *serpent)
 	{
 	case POMME:
 		SERPENT_Grow(serpent);
-		// Score
 		break;
 	case MURE:
-
 		Game_PushState(SplashGameOver_Instance());
-		// Score Instance push
 		break;
 	default:
 		break;
