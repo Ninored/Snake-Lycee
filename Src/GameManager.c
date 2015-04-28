@@ -43,7 +43,7 @@ void Game_Init()
 	gameVariables.Window_W = 16 * MAP_W;  //1280
 	gameVariables.window =
 			SDL_CreateWindow(
-					"Prototype State Manager",
+					"SNAKE",
 					SDL_WINDOWPOS_UNDEFINED,
 					SDL_WINDOWPOS_UNDEFINED,
 					gameVariables.Window_W,

@@ -51,10 +51,9 @@ static Texture background;
 void Init()
 {
 	SDL_RenderClear(Game_GetVariables()->renderer);
+
 	GRAPHIC_LoadPolice("./Assets/Menu/font.ttf", &font, 22);
 	GRAPHIC_LoadTexture("./Assets/Menu/Menu_Background_Button.jpg",&background);
-
-	// push state splash screen
 
 }
 

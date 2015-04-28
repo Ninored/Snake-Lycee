@@ -14,7 +14,7 @@
 int main( int argc, char* argv[])
 {
 
-	printf("Démarage\n");
+	printf("Demarage\n");
 
 	Game_Init();
 	Game_ChangeState(MENU_Instance());
