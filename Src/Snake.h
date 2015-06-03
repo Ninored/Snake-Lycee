@@ -3,6 +3,7 @@
 #define SNAKE_H_
 
 #include "Graphic.h"
+#include <stdbool.h>
 
 typedef struct
 {
@@ -17,7 +18,10 @@ typedef struct
 	Position Tete;
 	enum Direction direction;
 	int longueur;
-	Position corp[100];
+	Position corps[100];
+	enum  {NORMAL, ETENDU} Etat;
+	int compteur;
+	int lives;
 }Serpent;
 
 void SERPENT_Init(Serpent *serpent);
@@ -27,5 +31,6 @@ void SERPENT_Avancer(Serpent *serpent);
 void SERPENT_GetColision(Serpent *serpent);
 void SERPENT_Grow(Serpent *serpent);
 void SERPENT_Draw(Serpent *serpent, Tileset *tileset);
+int SERPENT_GetLives(Serpent *serpent);
 
 #endif /* SNAKE_H_ */

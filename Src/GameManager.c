@@ -33,7 +33,6 @@ void Game_Init()
 		exit(-1);
 	}
 	printf("[INFO]\tSDL initialized\n");
-
 	// Initialisation de la SDL_image
 	if(GRAPHIC_Init() == -1)
 		exit(-1);
@@ -54,6 +53,14 @@ void Game_Init()
 		printf("[ERROR]\tError while creating window: %s \n", SDL_GetError());
 		exit(-1);
 	}
+		// Icon Fenetre
+	gameVariables.icon = IMG_Load("./Assets/Icons/Icon.ico");
+	if(gameVariables.icon == NULL)
+	{
+		printf("[ERROR]\t|Error while loading \"./Assets/Icons/Icon.ico\"\n\t|-> %s\n", IMG_GetError());
+	}
+	SDL_SetWindowIcon(gameVariables.window, gameVariables.icon);
+
 
 	//Creation du contexte de rendu
 	gameVariables.renderer =
@@ -81,6 +88,7 @@ void Game_CleanUp()
 	SV_Destroy(&stateVec);
 	SDL_DestroyRenderer(gameVariables.renderer);
 	SDL_DestroyWindow(gameVariables.window);
+	SDL_FreeSurface(gameVariables.icon);
 
 	GRAPHIC_Quit();
 	SDL_Quit();
@@ -127,7 +135,7 @@ void Game_PopState()
 		SV_PopState(&stateVec);
 	}
 
-	if(stateVec.used !=0)
+	if(stateVec.used != 0)
 	{
 		stateVec.vector[stateVec.used - 1]->Resume();
 	}
@@ -135,13 +143,13 @@ void Game_PopState()
 
 void Game_HandleEvent()
 {
-	stateVec.vector[stateVec.used - 1]->HandleEvent();
+		stateVec.vector[stateVec.used - 1]->HandleEvent();
 }
 void Game_Update()
 {
-	stateVec.vector[stateVec.used - 1]->Update();
+		stateVec.vector[stateVec.used - 1]->Update();
 }
 void Game_Draw()
 {
-	stateVec.vector[stateVec.used - 1]->Draw();
+		stateVec.vector[stateVec.used - 1]->Draw();
 }

@@ -7,11 +7,9 @@
 
 
 static Tileset *lasttileset;
+static AnimationSet *lastanimset;
 
-/**
- * Fonction d'initialisation de la SDL_image
- * @return Status du chargement
- */
+
 int GRAPHIC_Init(void)
 {
 	int flag = IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
@@ -32,21 +30,13 @@ int GRAPHIC_Init(void)
 
 	return 0;
 }
-
-/**
- * Fonction libérant la mémoire alouée par SDL_image
- */
 void GRAPHIC_Quit(void)
 {
 	IMG_Quit();
 	TTF_Quit();
 }
 
-/**
- * Fonction de chargement d'une texture
- * @param filename Fichier contenant la texture a charger
- * @param texture Structure où stoquer la texture
- */
+
 void GRAPHIC_LoadTexture(char* filename, Texture* texture)
 {
 	SDL_Surface *_surface = IMG_Load(filename);
@@ -62,27 +52,12 @@ void GRAPHIC_LoadTexture(char* filename, Texture* texture)
 	printf("[INFO]\tTexture loaded: %s [%dx%d]\n",filename, texture->w, texture->h);
 	SDL_FreeSurface(_surface);
 }
-
-/**
- * Liberation de la texture
- * @param texture Structure a libérer
- */
 void GRAPHIC_FreeTexture(Texture* texture)
 {
 	SDL_DestroyTexture(texture->texture);
 	texture->texture = NULL;
 	texture->h = texture->w = 0;
 }
-
-/**
- * Application de la texture sur une position donnée avec largeur et hauteur
- * en paramètre
- * @param texture Texture a appliquer
- * @param posX Position X
- * @param posY Position Y
- * @param w Largeur
- * @param h Hauteur
- */
 void GRAPHIC_ApplyTexture(Texture* texture, int posX, int posY, int w, int h)
 {
 	SDL_Rect tmp;
@@ -94,7 +69,6 @@ void GRAPHIC_ApplyTexture(Texture* texture, int posX, int posY, int w, int h)
 	SDL_RenderCopy(Game_GetVariables()->renderer, texture->texture, NULL, &tmp);
 
 }
-
 void GRAPHIC_ApplyTextureAlpha(Texture* texture, int posX, int posY, int w, int h, int alpha)
 {
 	SDL_Rect tmp;
@@ -123,12 +97,10 @@ void GRAPHIC_LoadPolice(char* filename, Police *police, int size)
 	}
 	printf("[INFO]\tFont \"%s\" Loaded size : %d\n", filename, size);
 }
-
 void GRAPHIC_FreePolice(Police *police)
 {
 	TTF_CloseFont(police->font);
 }
-
 void GRAPHIC_Text(Police *police, int posX, int posY, char* text)
 {
 	SDL_Rect _pos;
@@ -158,7 +130,6 @@ void GRAPHIC_Text(Police *police, int posX, int posY, char* text)
 	SDL_DestroyTexture(_texture);
 
 }
-
 void GRAPHIC_TextAlpha(Police *police, int posX, int posY, int alpha, char* text)
 {
 	SDL_Rect _pos;
@@ -189,8 +160,6 @@ void GRAPHIC_TextAlpha(Police *police, int posX, int posY, int alpha, char* text
 	SDL_FreeSurface(_surface);
 	SDL_DestroyTexture(_texture);
 }
-
-
 void GRAPHIC_TextCentered(Police *police, int posX, int posY, char* text)
 {
 	SDL_Rect _pos;
@@ -221,7 +190,35 @@ void GRAPHIC_TextCentered(Police *police, int posX, int posY, char* text)
 	SDL_DestroyTexture(_texture);
 
 }
+void GRAPHIC_TextRight(Police *police, int posX, int posY, char* text)
+{
+	SDL_Rect _pos;
+	_pos.x = posX;
+	_pos.y = posY;
 
+	SDL_Color _white = {255, 255, 255};
+	SDL_Surface *_surface = TTF_RenderUTF8_Solid(police->font, text, _white);
+
+	if(_surface == NULL)
+	{
+		printf("[ERROR]\tError while creating font: %s\n", TTF_GetError());
+		return;
+	}
+
+	SDL_Texture *_texture = SDL_CreateTextureFromSurface(Game_GetVariables()->renderer, _surface);
+	SDL_QueryTexture(_texture, NULL, NULL, &_pos.w, &_pos.h);
+	_pos.x -= _pos.w;
+
+	if(SDL_RenderCopy(Game_GetVariables()->renderer, _texture, NULL, &_pos) == -1)
+	{
+		printf("[ERROR]\tError while writing : %s\n", text);
+		return;
+	}
+
+	SDL_FreeSurface(_surface);
+	SDL_DestroyTexture(_texture);
+
+}
 void GRAPHIC_TextCenteredAlpha(Police *police, int posX, int posY, int alpha, char* text)
 {
 	SDL_Rect _pos;
@@ -279,13 +276,12 @@ void GRAPHIC_LoadTile(char* filename, Tileset *tileset, int tilesize)
 
 	printf("[INFO]\tTilesets %s: Loaded %ix%i\n", filename, tilesize, tilesize);
 }
-
 void GRAPHIC_FreeTile(Tileset *tileset)
 {
 	GRAPHIC_FreeTexture(&tileset->palette);
 	ARRAY_CLIP_DESTROY(&tileset->clip);
+	lasttileset = NULL;
 }
-
 void GRAPHIC_ApplyTile(Tileset *tileset, int posX, int posY, int id)
 {
 	if(tileset == NULL)
@@ -316,5 +312,143 @@ void GRAPHIC_ApplyTile(Tileset *tileset, int posX, int posY, int id)
 				&tileset->clip.array[id],
 				&_dst);
 
+	}
+}
+void GRAPHIC_ApplyTileRaw(Tileset *tileset, int posX, int posY, int id)
+{
+	if(tileset == NULL)
+	{
+		SDL_Rect _dst;
+		_dst.x = posX;
+		_dst.y = posY;
+		_dst.h = lasttileset->tilesize;
+		_dst.w = lasttileset->tilesize;
+
+		SDL_RenderCopy(
+				Game_GetVariables()->renderer,
+				lasttileset->palette.texture,
+				&lasttileset->clip.array[id],
+				&_dst);
+	}
+	else
+	{
+		SDL_Rect _dst;
+		_dst.x = posX;
+		_dst.y = posY;
+		_dst.h = tileset->tilesize;
+		_dst.w = tileset->tilesize;
+
+		SDL_RenderCopy(
+				Game_GetVariables()->renderer,
+				tileset->palette.texture,
+				&tileset->clip.array[id],
+				&_dst);
+
+	}
+}
+
+
+void GRAPHIC_LoadAnimationSet(char* filename, AnimationSet* animSet, int nbAnim, int nbFramPAnim, int animSize)
+{
+	GRAPHIC_LoadTexture(filename, &animSet->palette);
+	animSet->animationArray = (Animation*)malloc(sizeof(Animation) * nbAnim );
+
+	animSet->animSize = animSize;
+	animSet->nbAnimations = nbAnim;
+	animSet->nbFramPAnim = nbFramPAnim;
+	animSet->playFlag = 0x00000000; //flag
+	animSet->nbAnim = nbAnim;
+
+	unsigned int i,j;
+	for(i = 0; i < nbAnim; i++)
+	{
+		ARRAY_CLIP_INIT(&animSet->animationArray[i].clip);
+		for(j = 0; j < nbFramPAnim; j++)
+		{
+			ARRAY_CLIP_ADD(
+					&animSet->animationArray[i].clip,
+					animSize * j,
+					animSize * i,
+					animSize,
+					animSize
+			);
+		}
+		animSet->animationArray[i].currentFram = 0;
+		animSet->animationArray[i].nbFram = nbFramPAnim;
+	}
+
+	lastanimset = animSet;
+}
+void GRAPHIC_FreeAnimationSet(AnimationSet* animSet)
+{
+	GRAPHIC_FreeTexture(&animSet->palette);
+	unsigned int i;
+	for(i = 0; i < animSet->nbAnim; i++)
+	{
+		ARRAY_CLIP_DESTROY(&animSet->animationArray[i].clip);
+	}
+
+	free(animSet->animationArray);
+	lastanimset = NULL;
+}
+void GRAPHIC_PlayAnimation(AnimationSet *animationSet, int posX, int posY, int id)
+{
+	//TODO: revoir les ID pour les flag prendre une variable indépendente et la réinit
+	if(animationSet == NULL)
+	{
+		if(id < 8)
+		{
+			lastanimset->playFlag ^= 1 << (id - 1) ;
+			lastanimset->animationArray[id-1].currentX = posX - 1;
+			lastanimset->animationArray[id-1].currentY = posY - 1;
+			lastanimset->animationArray[id-1].id = id;
+		}
+	}
+	else
+	{
+		if(id < 8)
+		{
+			animationSet->playFlag ^= 1 << (id - 1) ;
+			animationSet->animationArray[id-1].currentX = posX - 1;
+			animationSet->animationArray[id-1].currentY = posY - 1;
+			animationSet->animationArray[id-1].id = id;
+		}
+	}
+}
+void GRAPHIC_DrawAnimation(AnimationSet *animationSet)
+{
+	if((animationSet->playFlag & 0x00000001) == 0x00000001)
+	{
+	}
+	unsigned int i;
+	for(i = 0; i < 8; i++)
+	{
+		if( (animationSet->playFlag & (1<<i)) == (1<<i))
+		{
+
+			SDL_Rect _dst;
+			_dst.x = animationSet->animationArray[i].currentX * 16;// * animationSet->animSize;
+			_dst.y = animationSet->animationArray[i].currentY * 16;// * animationSet->animSize;
+			_dst.h = animationSet->animSize;
+			_dst.w = animationSet->animSize;
+
+			SDL_RenderCopy(
+					Game_GetVariables()->renderer,
+					animationSet->palette.texture,
+					&animationSet->animationArray[i].clip.array[animationSet->animationArray[i].currentFram],
+					&_dst);
+
+			if(animationSet->animationArray[i].currentFram < 3)
+			{
+				animationSet->animationArray[i].currentFram++;
+			}
+			else
+			{
+				animationSet->animationArray[i].currentFram = 0;
+				animationSet->playFlag ^= 1 << i;
+				animationSet->animationArray[i].currentX = 0;
+				animationSet->animationArray[i].currentY = 0;
+			}
+		}
 	}
 }

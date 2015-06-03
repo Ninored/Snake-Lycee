@@ -6,7 +6,8 @@
 #include "Snake.h"
 #include "Map.h"
 #include "SplashScreenPlay.h"
-
+#include "Score.h"
+#include "Pause.h"
 
 static void Init();
 static void CleanUp();
@@ -37,6 +38,7 @@ static SDL_Event event;
 static Texture background;
 static Police font;
 static Tileset tileset;
+static AnimationSet animationset;
 static Serpent serpent;
 static int clk = 0;  // variable temps ecoulé entre chaque images
 static int ms = 50; // vitesse de deplacement en miliseconde
@@ -44,14 +46,14 @@ static int ms = 50; // vitesse de deplacement en miliseconde
 void Init()
 {
 	SDL_RenderClear(Game_GetVariables()->renderer);
-	GRAPHIC_LoadTile("./Assets/Play/tileset.png",&tileset, 16);
-	GRAPHIC_LoadTexture("./Assets/Play/Play_Background.jpg", &background);
-	GRAPHIC_LoadPolice("./Assets/Play/font.ttf", &font, 16);
+	GRAPHIC_LoadTile("./Assets/Tilesets/tileset.png",&tileset, 16);
+	GRAPHIC_LoadTexture("./Assets/Textures/Play_Background.jpg", &background);
+	GRAPHIC_LoadPolice("./Assets/Fonts/font.ttf", &font, 16);
+	GRAPHIC_LoadAnimationSet("./Assets/Animations/pommeAnimation.png", &animationset, 4, 4, 48);
 	SERPENT_Init(&serpent);
 	MAP_Init();
 
 	Game_PushState(SplashPlay_Instance());
-
 }
 
 void CleanUp()
@@ -59,6 +61,7 @@ void CleanUp()
 	GRAPHIC_FreeTile(&tileset);
 	GRAPHIC_FreeTexture(&background);
 	GRAPHIC_FreePolice(&font);
+	GRAPHIC_FreeAnimationSet(&animationset);
 }
 
 void Pause()
@@ -73,8 +76,6 @@ void Resume()
 
 void HandleEvent()
 {
-
-
 	SDL_PollEvent(&event); // recupération des evenements
 			switch (event.type)
 			{
@@ -86,7 +87,7 @@ void HandleEvent()
 				switch(event.key.keysym.sym)
 				{
 				case SDLK_ESCAPE: 	// ESC
-					Game_Quit();
+					Game_PushState(Pause_Instance());
 					break;
 
 				case SDLK_UP:
@@ -104,14 +105,6 @@ void HandleEvent()
 				case SDLK_RIGHT:
 					SERPENT_ChangeDirection(&serpent, EST);
 					break;
-
-					// Pour le debug
-				case SDLK_t:
-					SERPENT_Grow(&serpent);
-					break;
-				case SDLK_r:
-					MAP_GenerateRandomeItem();
-					break;
 				}
 				break;
 			}
@@ -120,13 +113,17 @@ void HandleEvent()
 
 void Update()
 {
+
 	clk = SDL_GetTicks();
 	if( (ms) > SDL_GetTicks() - clk)
 		SDL_Delay(ms - (SDL_GetTicks() - clk));
 
+
+
+	// Génération d'item
 	MAP_GenerateRandomeItem();
 
-
+	// Faire avancer le serpent
 	SERPENT_Avancer(&serpent);
 
 
@@ -141,9 +138,20 @@ void Draw()
 
 	GRAPHIC_ApplyTexture(&background, 0, 0, Game_GetVariables()->Window_W, Game_GetVariables()->Window_H);
 
+	//GRAPHIC_Text(&font, 22, 0, SCORE_Get());
+	GRAPHIC_Text(&font, 24, 4, SCORE_Get(POMME));
+	GRAPHIC_Text(&font, 105, 4, SCORE_Get(CERISE));
+
+	unsigned int i;
+	for(i = 0; i < SERPENT_GetLives(&serpent); i++)
+	{
+		GRAPHIC_ApplyTileRaw(&tileset, 168 + i*(16+5) , 8, TILE_COEUR);
+	}
+
 	MAP_Draw();
 
-	SERPENT_Draw(&serpent, &tileset);
+	SERPENT_Draw(&serpent, &tileset); // Serpent
+	GRAPHIC_DrawAnimation(&animationset); // Les animations si nécessaire
 
 	SDL_RenderPresent(Game_GetVariables()->renderer);
 	SDL_UpdateWindowSurface(Game_GetVariables()->window);

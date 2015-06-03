@@ -37,11 +37,11 @@ static int clk;
 
 void Init()
 {
-	GRAPHIC_LoadTexture("./Assets/SplashScreenPlay/1.png", &un);
-	GRAPHIC_LoadTexture("./Assets/SplashScreenPlay/2.png", &deux);
-	GRAPHIC_LoadTexture("./Assets/SplashScreenPlay/3.png", &trois);
-	GRAPHIC_LoadTexture("./Assets/SplashScreenPlay/black.png", &noir);
-	GRAPHIC_LoadTexture("./Assets/Play/Play_Background.jpg", &background);
+	GRAPHIC_LoadTexture("./Assets/Textures/1.png", &un);
+	GRAPHIC_LoadTexture("./Assets/Textures/2.png", &deux);
+	GRAPHIC_LoadTexture("./Assets/Textures/3.png", &trois);
+	GRAPHIC_LoadTexture("./Assets/Textures/black.png", &noir);
+	GRAPHIC_LoadTexture("./Assets/Textures/Play_Background.jpg", &background);
 	number = 3;
 	clk = 0;
 }

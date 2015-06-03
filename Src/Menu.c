@@ -52,8 +52,8 @@ void Init()
 {
 	SDL_RenderClear(Game_GetVariables()->renderer);
 
-	GRAPHIC_LoadPolice("./Assets/Menu/font.ttf", &font, 22);
-	GRAPHIC_LoadTexture("./Assets/Menu/Menu_Background_Button.jpg",&background);
+	GRAPHIC_LoadPolice("./Assets/Fonts/font.ttf", &font, 22);
+	GRAPHIC_LoadTexture("./Assets/Textures/Menu_Background_Button.jpg",&background);
 
 }
 
@@ -103,6 +103,14 @@ void HandleEvent()
 				if(selector == 1) Game_Quit();
 			}
 			break;
+			case SDL_MOUSEBUTTONUP:
+				if(	event.button.x > 429 && event.button.x < 429+423 &&
+					event.button.y > 354 && event.button.y < 354+68
+				) Game_ChangeState(Play_Instance());
+				if(	event.button.x > 429 && event.button.x < 429+423 &&
+					event.button.y > 510 && event.button.y < 510+68
+				) Game_Quit();
+				break;
 		}
 	}
 }

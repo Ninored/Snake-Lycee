@@ -14,6 +14,7 @@ typedef struct {
 	SDL_Renderer *renderer;
 	int Window_W;
 	int Window_H;
+	SDL_Surface *icon;
 }GameVariables;
 
 GameVariables* Game_GetVariables(void);

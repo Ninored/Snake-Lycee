@@ -1,7 +1,7 @@
 #ifndef MAP_H_
 #define MAP_H_
 
-enum ITEM { VIDE, MURE, POMME};
+enum ITEM { VIDE = 0, MURE, POMME, CERISE, COEUR};
 
 
 void MAP_Init(void);
